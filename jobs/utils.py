@@ -77,7 +77,7 @@ def create_state(location):
     if not state_name:
         raise Exception(f"State missing for location: '{location.get('name')}'")
     if state_name in STATES:
-        state_name = STATES[state]
+        state_name = STATES[state_name]
     elif state_name in STATES.values():
         state_name = state_name
     else:
