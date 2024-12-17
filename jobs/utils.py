@@ -73,7 +73,7 @@ def create_state(location):
     status = Status.objects.get(name="Active")
     state = LocationType.objects.get(name="State")
     state_name = location.get("state")
-    breakpoint()
+
     if not state_name:
         raise Exception(f"State missing for location: '{location.get('name')}'")
     if state_name in STATES:
@@ -82,6 +82,7 @@ def create_state(location):
         state_name = state
     else:
         raise Exception(f"State {state_name} does not appear to be correct.")
+    breakpoint()
     _, created = Location.objects.get_or_create(
         name=state_name, location_type=state, status=status
     )
