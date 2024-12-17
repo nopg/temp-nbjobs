@@ -108,8 +108,10 @@ def create_site(location):
     site_name = location.get("name")
     if not site_name:
         raise Exception(f"Site Name missing!")
+    parent = Location.objects.get(name=location["city"])
     dc_location = LocationType.objects.get(name="Data Center")
     br_location = LocationType.objects.get(name="Branch")
+
     if site_name.endswith("-BR"):
         loc_type = br_location
     elif site_name.endswith("-DC"):
@@ -118,7 +120,7 @@ def create_site(location):
         raise Exception(f"Site Name does not follow -BR/-DC standards.")
 
     _, created = Location.objects.get_or_create(
-        name=site_name, status=status, location_type=loc_type
+        name=site_name, status=status, location_type=loc_type, parent=parent
     )
     if created:
         return site_name
