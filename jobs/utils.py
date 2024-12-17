@@ -93,11 +93,12 @@ def create_state(location):
 def create_city(location):
     status = Status.objects.get(name="Active")
     city = LocationType.objects.get(name="City")
+    parent = Location.objects.get(name=location["state"])
     city_name = location.get("city")
     if not city_name:
         raise Exception(f"City missing for location: '{location.get('name')}'")
     _, created = Location.objects.get_or_create(
-        name=city_name, location_type=city, status=status
+        name=city_name, location_type=city, status=status, parent=parent
     )
     if created:
         return city_name
