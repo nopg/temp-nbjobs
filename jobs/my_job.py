@@ -1,5 +1,5 @@
 from nautobot.apps.jobs import Job, register_jobs, FileVar
-from jobs.load_locations import main
+from ..jobs.load_locations import main
 
 class ImportLocations(Job):
     class Meta:
