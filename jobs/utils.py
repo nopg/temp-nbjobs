@@ -1,6 +1,6 @@
 import csv
 from nautobot.dcim.models import Location, LocationType
-#from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FieldFile
 STATES = {
     'AL': 'Alabama',
     'AK': 'Alaska',
