@@ -69,6 +69,17 @@ def load_csv(filename, logger):
     return list(locations)
 
 
+def get_state_name(state_name):
+    if state_name in STATES:
+        state_name = STATES[state_name]
+    elif state_name in STATES.values():
+        state_name = state_name
+    else:
+        raise Exception(f"State {state_name} does not appear to be correct.")
+
+    return state_name
+
+
 def create_state(location):
     status = Status.objects.get(name="Active")
     state = LocationType.objects.get(name="State")
@@ -76,12 +87,7 @@ def create_state(location):
 
     if not state_name:
         raise Exception(f"State missing for location: '{location.get('name')}'")
-    if state_name in STATES:
-        state_name = STATES[state_name]
-    elif state_name in STATES.values():
-        state_name = state_name
-    else:
-        raise Exception(f"State {state_name} does not appear to be correct.")
+    state_name = get_state_name(state_name)
 
     _, created = Location.objects.get_or_create(
         name=state_name, location_type=state, status=status
@@ -93,7 +99,7 @@ def create_state(location):
 def create_city(location):
     status = Status.objects.get(name="Active")
     city = LocationType.objects.get(name="City")
-    parent = Location.objects.get(name=location["state"])
+    parent = Location.objects.get(name=get_state_name(location["state"]))
     city_name = location.get("city")
     if not city_name:
         raise Exception(f"City missing for location: '{location.get('name')}'")
