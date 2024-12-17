@@ -79,10 +79,10 @@ def create_state(location):
     if state_name in STATES:
         state_name = STATES[state]
     elif state_name in STATES.values():
-        state_name = state
+        state_name = state_name
     else:
         raise Exception(f"State {state_name} does not appear to be correct.")
-    breakpoint()
+
     _, created = Location.objects.get_or_create(
         name=state_name, location_type=state, status=status
     )
