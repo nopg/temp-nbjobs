@@ -2,6 +2,7 @@ import csv
 from io import StringIO
 
 from nautobot.dcim.models import Location, LocationType
+from nautobot.extras.models import Status
 from django.db.models.fields.files import FieldFile
 STATES = {
     'AL': 'Alabama',
@@ -68,6 +69,7 @@ def load_csv(filename, logger):
     return list(locations)
 
 def create_state(name):
+    status = Status.objects.get(name="Active")
     state, created = Location.objects.get_or_create(name=name, location_type=LocationType.objects.get(name="State"))
     return created
 
