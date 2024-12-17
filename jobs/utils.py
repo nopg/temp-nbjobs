@@ -70,7 +70,7 @@ def load_csv(filename, logger):
 
 def create_state(name):
     status = Status.objects.get(name="Active")
-    state, created = Location.objects.get_or_create(name=name, location_type=LocationType.objects.get(name="State"))
+    state, created = Location.objects.get_or_create(name=name, location_type=LocationType.objects.get(name="State"),status=status)
     return created
 
 def load_locations(logger, locations):
