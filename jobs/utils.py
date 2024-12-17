@@ -139,3 +139,5 @@ def main(logger, filename) -> None:
         created = create_site(location)
         if created:
             logger.info(f"Created Site: '{created}'")
+
+    logger.info(f"Finished loading sites.")
