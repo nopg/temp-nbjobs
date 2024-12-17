@@ -61,13 +61,12 @@ STATES = {
 
 
 def load_csv(filename, logger):
-    logger.warning(f"type: ```{type(filename)}```")
     if isinstance(filename, FieldFile):
         decoded_csv = filename.read().decode("utf-8")
         locations = csv.DictReader(StringIO(decoded_csv))
     else:
         locations = csv.DictReader(open(filename, "r"))
-    logger.warning(f"```{locations=}```")
+    logger.debug(f"```{locations=}```")
     return list(locations)
 
 
@@ -127,6 +126,8 @@ def create_site(location):
 def main(logger, filename) -> None:
 
     locations = load_csv(filename, logger)
+    logger.debug(f"```{locations=}```")
+    
     for location in locations:
         created = create_state(location)
         if created:
