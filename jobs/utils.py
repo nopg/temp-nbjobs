@@ -57,9 +57,11 @@ STATES = {
 
 def load_csv(filename):
     if isinstance(filename, FieldFile):
-        filename = filename.path
+        data = filename.file.open("r")
+    else:
+        data = open(filename, "r")
     try:
-        locations = csv.DictReader(open(filename, "r"))
+        locations = csv.DictReader(data)
         return list(locations)
     except FileNotFoundError:
         raise Exception(f"{filename} not found!")
