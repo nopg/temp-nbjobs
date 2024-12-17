@@ -1,62 +1,64 @@
 import csv
 from io import StringIO
 
+from django.db.models.fields.files import FieldFile
 from nautobot.dcim.models import Location, LocationType
 from nautobot.extras.models import Status
-from django.db.models.fields.files import FieldFile
+
 STATES = {
-    'AL': 'Alabama',
-    'AK': 'Alaska',
-    'AZ': 'Arizona',
-    'AR': 'Arkansas',
-    'CA': 'California',
-    'CO': 'Colorado',
-    'CT': 'Connecticut',
-    'DE': 'Delaware',
-    'DC': 'District of Columbia',
-    'FL': 'Florida',
-    'GA': 'Georgia',
-    'HI': 'Hawaii',
-    'ID': 'Idaho',
-    'IL': 'Illinois',
-    'IN': 'Indiana',
-    'IA': 'Iowa',
-    'KS': 'Kansas',
-    'KY': 'Kentucky',
-    'LA': 'Louisiana',
-    'ME': 'Maine',
-    'MD': 'Maryland',
-    'MA': 'Massachusetts',
-    'MI': 'Michigan',
-    'MN': 'Minnesota',
-    'MS': 'Mississippi',
-    'MO': 'Missouri',
-    'MT': 'Montana',
-    'NE': 'Nebraska',
-    'NV': 'Nevada',
-    'NH': 'New Hampshire',
-    'NJ': 'New Jersey',
-    'NM': 'New Mexico',
-    'NY': 'New York',
-    'NC': 'North Carolina',
-    'ND': 'North Dakota',
-    'OH': 'Ohio',
-    'OK': 'Oklahoma',
-    'OR': 'Oregon',
-    'PA': 'Pennsylvania',
-    'RI': 'Rhode Island',
-    'SC': 'South Carolina',
-    'SD': 'South Dakota',
-    'TN': 'Tennessee',
-    'TX': 'Texas',
-    'UT': 'Utah',
-    'VT': 'Vermont',
-    'VA': 'Virginia',
-    'WA': 'Washington',
-    'WV': 'West Virginia',
-    'WI': 'Wisconsin',
-    'WY': 'Wyoming'
+    "AL": "Alabama",
+    "AK": "Alaska",
+    "AZ": "Arizona",
+    "AR": "Arkansas",
+    "CA": "California",
+    "CO": "Colorado",
+    "CT": "Connecticut",
+    "DE": "Delaware",
+    "DC": "District of Columbia",
+    "FL": "Florida",
+    "GA": "Georgia",
+    "HI": "Hawaii",
+    "ID": "Idaho",
+    "IL": "Illinois",
+    "IN": "Indiana",
+    "IA": "Iowa",
+    "KS": "Kansas",
+    "KY": "Kentucky",
+    "LA": "Louisiana",
+    "ME": "Maine",
+    "MD": "Maryland",
+    "MA": "Massachusetts",
+    "MI": "Michigan",
+    "MN": "Minnesota",
+    "MS": "Mississippi",
+    "MO": "Missouri",
+    "MT": "Montana",
+    "NE": "Nebraska",
+    "NV": "Nevada",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "NM": "New Mexico",
+    "NY": "New York",
+    "NC": "North Carolina",
+    "ND": "North Dakota",
+    "OH": "Ohio",
+    "OK": "Oklahoma",
+    "OR": "Oregon",
+    "PA": "Pennsylvania",
+    "RI": "Rhode Island",
+    "SC": "South Carolina",
+    "SD": "South Dakota",
+    "TN": "Tennessee",
+    "TX": "Texas",
+    "UT": "Utah",
+    "VT": "Vermont",
+    "VA": "Virginia",
+    "WA": "Washington",
+    "WV": "West Virginia",
+    "WI": "Wisconsin",
+    "WY": "Wyoming",
 }
+
 
 def load_csv(filename, logger):
     logger.warning(f"type: ```{type(filename)}```")
@@ -68,38 +70,70 @@ def load_csv(filename, logger):
     logger.warning(f"```{locations=}```")
     return list(locations)
 
-def create_state(name):
-    status = Status.objects.get(name="Active")
-    state, created = Location.objects.get_or_create(name=name, location_type=LocationType.objects.get(name="State"),status=status)
-    return created
 
-def load_locations(logger, locations):
-    for location in locations:
-        state = location.get("state")
-        if not state:
-            raise Exception(f"State missing for location: '{location.get('name')}'")
-        if state in STATES:
-            state_name = STATES[state]
-        elif state in STATES.values():
-            state_name = state
-        else:
-            raise Exception(f"State {state} does not appear to be correct.")
-        created = create_state(state_name)
-        if created:
-            logger.info(f"Created State: '{state_name}")
+def create_state(location):
+    status = Status.objects.get(name="Active")
+    state = LocationType.objects.get(name="State")
+    state_name = location.get("state")
+    if not state_name:
+        raise Exception(f"State missing for location: '{location.get('name')}'")
+    if state_name in STATES:
+        state_name = STATES[state]
+    elif state_name in STATES.values():
+        state_name = state
+    else:
+        raise Exception(f"State {state_name} does not appear to be correct.")
+    _, created = Location.objects.get_or_create(
+        name=state_name, location_type=state, status=status
+    )
+    if created:
+        return state_name
+
+
+def create_city(location):
+    status = Status.objects.get(name="Active")
+    city = LocationType.objects.get(name="City")
+    city_name = location.get("city")
+    if not city_name:
+        raise Exception(f"City missing for location: '{location.get('name')}'")
+    _, created = Location.objects.get_or_create(
+        name=city_name, location_type=city, status=status
+    )
+    if created:
+        return city_name
+
+
+def create_site(location):
+    status = Status.objects.get(name="Active")
+    site_name = location.get("name")
+    if not site_name:
+        raise Exception(f"Site Name missing!")
+    dc_location = LocationType.objects.get(name="Data Center")
+    br_location = LocationType.objects.get(name="Branch")
+    if site_name.endswith("-BR"):
+        loc_type = br_location
+    elif site_name.endswith("-DC"):
+        loc_type = dc_location
+    else:
+        raise Exception(f"Site Name does not follow -BR/-DC standards.")
+
+    _, created = Location.objects.get_or_create(
+        name=site_name, status=status, location_type=loc_type
+    )
+    if created:
+        return site_name
+
 
 def main(logger, filename) -> None:
 
     locations = load_csv(filename, logger)
-    logger.info(f"locations = {locations}")
-
-    load_locations(logger, locations)
-
-
-if __name__ == "__main__":
-    import logging
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.DEBUG)
-
-    filename = "locations.csv"
-    main(logger=logger, filename=filename)
+    for location in locations:
+        created = create_state(location)
+        if created:
+            logger.info(f"Created State: '{created}'")
+        created = create_city(location)
+        if created:
+            logger.info(f"Created City: '{created}'")
+        created = create_site(location)
+        if created:
+            logger.info(f"Created Site: '{created}'")
