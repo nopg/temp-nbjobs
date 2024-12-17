@@ -1,6 +1,6 @@
 import csv
 from nautobot.dcim.models import Location, LocationType
-from django.db.models.fields.files import FieldFile
+#from django.db.models.fields.files import FieldFile
 STATES = {
     'AL': 'Alabama',
     'AK': 'Alaska',
@@ -57,10 +57,13 @@ STATES = {
 
 def load_csv(filename, logger):
     logger.warning(f"type: ```{type(filename)}```")
-    if isinstance(filename, FieldFile):
+    # if isinstance(filename, FieldFile):
+    if False:
         data = filename.open(mode="r")
     else:
         data = open(filename, "r")
+    logger.warning(f"type-data: ```{type(data)}```")
+    logger.warning(data)
     try:
         locations = csv.DictReader(data)
         return list(locations)
