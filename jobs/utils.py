@@ -1,4 +1,6 @@
 import csv
+from io import StringIO
+
 from nautobot.dcim.models import Location, LocationType
 from django.db.models.fields.files import FieldFile
 STATES = {
@@ -58,16 +60,11 @@ STATES = {
 def load_csv(filename, logger):
     logger.warning(f"type: ```{type(filename)}```")
     if isinstance(filename, FieldFile):
-        data = filename.open(mode="r")
+        decoded_csv = filename.read().decode("utf-8")
+        locations = csv.DictReader(StringIO(decoded_csv))
     else:
-        data = open(filename, "r")
-    logger.warning(f"type-data: ```{type(data)}```")
-    logger.warning(data)
-    try:
-        locations = csv.DictReader(data)
-        return list(locations)
-    except FileNotFoundError:
-        raise Exception(f"{filename} not found!")
+        locations = csv.DictReader(open(filename, "r"))
+    logger.warning(locations)
 
 def create_state(name):
     state, created = Location.objects.get_or_create(name=state, location_type=LocationType.objects.get(name="State"))
