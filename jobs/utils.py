@@ -55,7 +55,8 @@ STATES = {
     'WY': 'Wyoming'
 }
 
-def load_csv(filename):
+def load_csv(filename, logger):
+    logger.warning(f"type: {type(filename)}")
     if isinstance(filename, FieldFile):
         data = filename.open(mode="r")
     else:
@@ -87,7 +88,7 @@ def load_locations(logger, locations):
 
 def main(logger, filename) -> None:
 
-    locations = load_csv(filename=filename)
+    locations = load_csv(filename, logger)
     logger.info(f"locations = {locations}")
 
     load_locations(logger, locations)
