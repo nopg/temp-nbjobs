@@ -66,7 +66,6 @@ def load_csv(filename, logger):
         locations = csv.DictReader(StringIO(decoded_csv))
     else:
         locations = csv.DictReader(open(filename, "r"))
-    logger.debug(f"```{locations=}```")
     return list(locations)
 
 
@@ -74,6 +73,7 @@ def create_state(location):
     status = Status.objects.get(name="Active")
     state = LocationType.objects.get(name="State")
     state_name = location.get("state")
+    breakpoint()
     if not state_name:
         raise Exception(f"State missing for location: '{location.get('name')}'")
     if state_name in STATES:
@@ -127,7 +127,7 @@ def main(logger, filename) -> None:
 
     locations = load_csv(filename, logger)
     logger.debug(f"```{locations=}```")
-    
+
     for location in locations:
         created = create_state(location)
         if created:
