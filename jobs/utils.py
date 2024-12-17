@@ -57,7 +57,7 @@ STATES = {
 
 def load_csv(filename):
     if isinstance(filename, FieldFile):
-        data = filename.file.open("r")
+        data = filename.open("r")
     else:
         data = open(filename, "r")
     try:
