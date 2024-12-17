@@ -56,7 +56,7 @@ STATES = {
 }
 
 def load_csv(filename, logger):
-    logger.warning(f"type: {type(filename)}")
+    logger.warning(f"type: ```{type(filename)}```")
     if isinstance(filename, FieldFile):
         data = filename.open(mode="r")
     else:
