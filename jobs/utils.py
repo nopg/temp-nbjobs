@@ -64,7 +64,7 @@ def load_csv(filename, logger):
         locations = csv.DictReader(StringIO(decoded_csv))
     else:
         locations = csv.DictReader(open(filename, "r"))
-    logger.warning(locations)
+    logger.warning(f"```{locations=}```")
 
 def create_state(name):
     state, created = Location.objects.get_or_create(name=state, location_type=LocationType.objects.get(name="State"))
