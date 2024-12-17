@@ -1,5 +1,5 @@
 from nautobot.apps.jobs import Job, register_jobs, FileVar
-import load_locations
+from jobs.load_locations import main
 
 class ImportLocations(Job):
     class Meta:
@@ -10,6 +10,6 @@ class ImportLocations(Job):
 
     def run(self, filename):
         self.logger.info("Testing...")
-        load_locations.run(logger=self.logger, filename=filename)
+        main(logger=self.logger, filename=filename)
 
 register_jobs(ImportLocations)
